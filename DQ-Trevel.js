@@ -1869,15 +1869,19 @@ function loop() {
 				clear();
 
 				//console.log("Machine Bet: " + action + "{" + env.nextBet + "} isKelly: " + env.useKelly + " isMartingale: " + env.useMartingale);
-				console.log("Bet Number: " + env.totalBets + " | Outcome: " + outcome);
-				console.log("Win Rate: " + (env.winRate * 100).toFixed(2) + " | Hi/Lo Win Rate: " + ((env.hbw / env.totalBets) * 100).toFixed(2) + " / " + ((env.lbw / env.totalBets) * 100).toFixed(2));
-				console.log("Wins/Loses: " + env.totalWins + " / " + (env.totalBets - env.totalWins));
-				console.log("Hi/Lo Bets: " + env.hbCount + " / " + env.lbcount);
-				console.log("Hi/Lo Wins: " + env.hbw + " / " + env.lbw);
-				console.log("Hi/Lo Loses: " + env.hbl + " / " + env.lbl);
-				console.log("Hi Probability: " + env.hbProbability.toFixed(2) + " | Lo Probability: " + env.lbProbability.toFixed(2));
-				console.log("Client Seed: " + $('#next_client_seed').val() + " | Lotto Tickets: " + $('#user_lottery_tickets').html() + " | Rewards Points: " + $('.user_reward_points').text());
-				console.log("Profit: " + env.profit + " | Balance: " + env.getCurrentBalance().toFixed(8));
+				
+				console.log("| Client Seed: " + $('#next_client_seed').val() + " | Lotto Tickets: " + $('#user_lottery_tickets').html() + " | Rewards Points: " + $('.user_reward_points').text());
+				console.log(" 8=========================== "+ env.totalBets + " ===========================D ~ ")
+				console.log("| Win Rate: " + (env.winRate * 100).toFixed(2) + " | Hi Win Rate: " + ((env.hbw / env.totalBets) * 100).toFixed(2) + " | Lo Win Rate: " + ((env.lbw / env.totalBets) * 100).toFixed(2) + " |");
+				console.log("|____________________________________________________________|");
+				console.log("| Total Wins: " + env.totalWins + "  | Total Hi: " + env.hbCount + "  |  Hi Wins: " + env.hbw + "  |  Hi Loss " + env.hbl+ "  |");
+				console.log("| Total Loss: " + (env.totalBets - env.totalWins) + "  |  Total Lo " + env.lbcount + "  |  Lo Wins: " + env.lbw + "  |  Lo Loss " + env.lbl+"  |");
+				console.log("|____________________________________________________________|");
+				console.log("|    Hi Probability: " + env.hbProbability.toFixed(2) + "     |     Lo Probability: " + env.lbProbability.toFixed(2) + "     |");
+				console.log("|____________________________________________________________|");
+				console.log("|     Last Bet: " + env.betHistory[env.betHistory.length - 1]+ "    |     Outcome: " + outcome+ "    |     Stake: "+ env.betAmount+ "     |");
+				console.log("|      Profit: " + env.profit + "     |     Balance: " + env.getCurrentBalance().toFixed(8)+ "      |");
+				console.log("|____________________________________________________________|")
 
 			}
 		} else {
