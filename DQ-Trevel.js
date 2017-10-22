@@ -1,5 +1,5 @@
 var R = {}; // the Recurrent library
-(function (global) {
+(function(global) {
 	"use strict";
 	// Utility fun
 	function assert(condition, message) {
@@ -15,7 +15,7 @@ var R = {}; // the Recurrent library
 	// Random numbers utils
 	var return_v = false;
 	var v_val = 0.0;
-	var gaussRandom = function () {
+	var gaussRandom = function() {
 		if (return_v) {
 			return_v = false;
 			return v_val;
@@ -29,18 +29,18 @@ var R = {}; // the Recurrent library
 		return_v = true;
 		return u * c;
 	}
-	var randf = function (a, b) {
+	var randf = function(a, b) {
 		return Math.random() * (b - a) + a;
 	}
-	var randi = function (a, b) {
+	var randi = function(a, b) {
 		return Math.floor(Math.random() * (b - a) + a);
 	}
-	var randn = function (mu, std) {
+	var randn = function(mu, std) {
 		return mu + gaussRandom() * std;
 	}
 	// helper function returns array of zeros of length n
 	// and uses typed arrays if available
-	var zeros = function (n) {
+	var zeros = function(n) {
 		if (typeof (n) === 'undefined' || isNaN(n)) {
 			return [];
 		}
@@ -56,7 +56,7 @@ var R = {}; // the Recurrent library
 		}
 	}
 	// Mat holds a matrix
-	var Mat = function (n, d) {
+	var Mat = function(n, d) {
 		// n is number of rows d is number of columns
 		this.n = n;
 		this.d = d;
@@ -64,37 +64,37 @@ var R = {}; // the Recurrent library
 		this.dw = zeros(n * d);
 	}
 	Mat.prototype = {
-		get: function (row, col) {
+		get: function(row, col) {
 			// slow but careful accessor function
 			// we want row-major order
 			var ix = (this.d * row) + col;
 			assert(ix >= 0 && ix < this.w.length);
 			return this.w[ix];
 		},
-		set: function (row, col, v) {
+		set: function(row, col, v) {
 			// slow but careful accessor function
 			var ix = (this.d * row) + col;
 			assert(ix >= 0 && ix < this.w.length);
 			this.w[ix] = v;
 		},
-		setFrom: function (arr) {
+		setFrom: function(arr) {
 			for (var i = 0, n = arr.length; i < n; i++) {
 				this.w[i] = arr[i];
 			}
 		},
-		setColumn: function (m, i) {
+		setColumn: function(m, i) {
 			for (var q = 0, n = m.w.length; q < n; q++) {
 				this.w[(this.d * q) + i] = m.w[q];
 			}
 		},
-		toJSON: function () {
+		toJSON: function() {
 			var json = {};
 			json['n'] = this.n;
 			json['d'] = this.d;
 			json['w'] = this.w;
 			return json;
 		},
-		fromJSON: function (json) {
+		fromJSON: function(json) {
 			this.n = json.n;
 			this.d = json.d;
 			this.w = zeros(this.n * this.d);
@@ -104,12 +104,12 @@ var R = {}; // the Recurrent library
 			}
 		}
 	}
-	var copyMat = function (b) {
+	var copyMat = function(b) {
 		var a = new Mat(b.n, b.d);
 		a.setFrom(b.w);
 		return a;
 	}
-	var copyNet = function (net) {
+	var copyNet = function(net) {
 		// nets are (k,v) pairs with k = string key, v = Mat()
 		var new_net = {};
 		for (var p in net) {
@@ -119,7 +119,7 @@ var R = {}; // the Recurrent library
 		}
 		return new_net;
 	}
-	var updateMat = function (m, alpha) {
+	var updateMat = function(m, alpha) {
 		// updates in place
 		for (var i = 0, n = m.n * m.d; i < n; i++) {
 			if (m.dw[i] !== 0) {
@@ -128,14 +128,14 @@ var R = {}; // the Recurrent library
 			}
 		}
 	}
-	var updateNet = function (net, alpha) {
+	var updateNet = function(net, alpha) {
 		for (var p in net) {
 			if (net.hasOwnProperty(p)) {
 				updateMat(net[p], alpha);
 			}
 		}
 	}
-	var netToJSON = function (net) {
+	var netToJSON = function(net) {
 		var j = {};
 		for (var p in net) {
 			if (net.hasOwnProperty(p)) {
@@ -144,7 +144,7 @@ var R = {}; // the Recurrent library
 		}
 		return j;
 	}
-	var netFromJSON = function (j) {
+	var netFromJSON = function(j) {
 		var net = {};
 		for (var p in j) {
 			if (j.hasOwnProperty(p)) {
@@ -154,7 +154,7 @@ var R = {}; // the Recurrent library
 		}
 		return net;
 	}
-	var netZeroGrads = function (net) {
+	var netZeroGrads = function(net) {
 		for (var p in net) {
 			if (net.hasOwnProperty(p)) {
 				var mat = net[p];
@@ -162,7 +162,7 @@ var R = {}; // the Recurrent library
 			}
 		}
 	}
-	var netFlattenGrads = function (net) {
+	var netFlattenGrads = function(net) {
 		var n = 0;
 		for (var p in net) {
 			if (net.hasOwnProperty(p)) {
@@ -184,7 +184,7 @@ var R = {}; // the Recurrent library
 		return g;
 	}
 	// return Mat but filled with random numbers from gaussian
-	var RandMat = function (n, d, mu, std) {
+	var RandMat = function(n, d, mu, std) {
 		var m = new Mat(n, d);
 		fillRandn(m, mu, std);
 		//fillRand(m,-std,std); // kind of :P
@@ -192,23 +192,23 @@ var R = {}; // the Recurrent library
 	}
 	// Mat utils
 	// fill matrix with random gaussian numbers
-	var fillRandn = function (m, mu, std) {
+	var fillRandn = function(m, mu, std) {
 		for (var i = 0, n = m.w.length; i < n; i++) {
 			m.w[i] = randn(mu, std);
 		}
 	}
-	var fillRand = function (m, lo, hi) {
+	var fillRand = function(m, lo, hi) {
 		for (var i = 0, n = m.w.length; i < n; i++) {
 			m.w[i] = randf(lo, hi);
 		}
 	}
-	var gradFillConst = function (m, c) {
+	var gradFillConst = function(m, c) {
 		for (var i = 0, n = m.dw.length; i < n; i++) {
 			m.dw[i] = c
 		}
 	}
 	// Transformer definitions
-	var Graph = function (needs_backprop) {
+	var Graph = function(needs_backprop) {
 		if (typeof needs_backprop === 'undefined') {
 			needs_backprop = true;
 		}
@@ -219,12 +219,12 @@ var R = {}; // the Recurrent library
 		this.backprop = [];
 	}
 	Graph.prototype = {
-		backward: function () {
+		backward: function() {
 			for (var i = this.backprop.length - 1; i >= 0; i--) {
 				this.backprop[i](); // tick!
 			}
 		},
-		rowPluck: function (m, ix) {
+		rowPluck: function(m, ix) {
 			// pluck a row of m with index ix and return it as col vector
 			assert(ix >= 0 && ix < m.n);
 			var d = m.d;
@@ -233,7 +233,7 @@ var R = {}; // the Recurrent library
 				out.w[i] = m.w[d * ix + i];
 			} // copy over the data
 			if (this.needs_backprop) {
-				var backward = function () {
+				var backward = function() {
 					for (var i = 0, n = d; i < n; i++) {
 						m.dw[d * ix + i] += out.dw[i];
 					}
@@ -242,7 +242,7 @@ var R = {}; // the Recurrent library
 			}
 			return out;
 		},
-		tanh: function (m) {
+		tanh: function(m) {
 			// tanh nonlinearity
 			var out = new Mat(m.n, m.d);
 			var n = m.w.length;
@@ -250,7 +250,7 @@ var R = {}; // the Recurrent library
 				out.w[i] = Math.tanh(m.w[i]);
 			}
 			if (this.needs_backprop) {
-				var backward = function () {
+				var backward = function() {
 					for (var i = 0; i < n; i++) {
 						// grad for z = tanh(x) is (1 - z^2)
 						var mwi = out.w[i];
@@ -261,7 +261,7 @@ var R = {}; // the Recurrent library
 			}
 			return out;
 		},
-		sigmoid: function (m) {
+		sigmoid: function(m) {
 			// sigmoid nonlinearity
 			var out = new Mat(m.n, m.d);
 			var n = m.w.length;
@@ -269,7 +269,7 @@ var R = {}; // the Recurrent library
 				out.w[i] = sig(m.w[i]);
 			}
 			if (this.needs_backprop) {
-				var backward = function () {
+				var backward = function() {
 					for (var i = 0; i < n; i++) {
 						// grad for z = tanh(x) is (1 - z^2)
 						var mwi = out.w[i];
@@ -280,14 +280,14 @@ var R = {}; // the Recurrent library
 			}
 			return out;
 		},
-		relu: function (m) {
+		relu: function(m) {
 			var out = new Mat(m.n, m.d);
 			var n = m.w.length;
 			for (var i = 0; i < n; i++) {
 				out.w[i] = Math.max(0, m.w[i]); // relu
 			}
 			if (this.needs_backprop) {
-				var backward = function () {
+				var backward = function() {
 					for (var i = 0; i < n; i++) {
 						m.dw[i] += m.w[i] > 0 ? out.dw[i] : 0.0;
 					}
@@ -296,7 +296,7 @@ var R = {}; // the Recurrent library
 			}
 			return out;
 		},
-		mul: function (m1, m2) {
+		mul: function(m1, m2) {
 			// multiply matrices m1 * m2
 			assert(m1.d === m2.n, 'matmul dimensions misaligned');
 			var n = m1.n;
@@ -312,7 +312,7 @@ var R = {}; // the Recurrent library
 				}
 			}
 			if (this.needs_backprop) {
-				var backward = function () {
+				var backward = function() {
 					for (var i = 0; i < m1.n; i++) { // loop over rows of m1
 						for (var j = 0; j < m2.d; j++) { // loop over cols of m2
 							for (var k = 0; k < m1.d; k++) { // dot product loop
@@ -327,14 +327,14 @@ var R = {}; // the Recurrent library
 			}
 			return out;
 		},
-		add: function (m1, m2) {
+		add: function(m1, m2) {
 			assert(m1.w.length === m2.w.length);
 			var out = new Mat(m1.n, m1.d);
 			for (var i = 0, n = m1.w.length; i < n; i++) {
 				out.w[i] = m1.w[i] + m2.w[i];
 			}
 			if (this.needs_backprop) {
-				var backward = function () {
+				var backward = function() {
 					for (var i = 0, n = m1.w.length; i < n; i++) {
 						m1.dw[i] += out.dw[i];
 						m2.dw[i] += out.dw[i];
@@ -344,7 +344,7 @@ var R = {}; // the Recurrent library
 			}
 			return out;
 		},
-		dot: function (m1, m2) {
+		dot: function(m1, m2) {
 			// m1 m2 are both column vectors
 			assert(m1.w.length === m2.w.length);
 			var out = new Mat(1, 1);
@@ -354,7 +354,7 @@ var R = {}; // the Recurrent library
 			}
 			out.w[0] = dot;
 			if (this.needs_backprop) {
-				var backward = function () {
+				var backward = function() {
 					for (var i = 0, n = m1.w.length; i < n; i++) {
 						m1.dw[i] += m2.w[i] * out.dw[0];
 						m2.dw[i] += m1.w[i] * out.dw[0];
@@ -364,14 +364,14 @@ var R = {}; // the Recurrent library
 			}
 			return out;
 		},
-		eltmul: function (m1, m2) {
+		eltmul: function(m1, m2) {
 			assert(m1.w.length === m2.w.length);
 			var out = new Mat(m1.n, m1.d);
 			for (var i = 0, n = m1.w.length; i < n; i++) {
 				out.w[i] = m1.w[i] * m2.w[i];
 			}
 			if (this.needs_backprop) {
-				var backward = function () {
+				var backward = function() {
 					for (var i = 0, n = m1.w.length; i < n; i++) {
 						m1.dw[i] += m2.w[i] * out.dw[i];
 						m2.dw[i] += m1.w[i] * out.dw[i];
@@ -382,7 +382,7 @@ var R = {}; // the Recurrent library
 			return out;
 		},
 	}
-	var softmax = function (m) {
+	var softmax = function(m) {
 		var out = new Mat(m.n, m.d); // probability volume
 		var maxval = -999999;
 		for (var i = 0, n = m.w.length; i < n; i++) {
@@ -401,13 +401,13 @@ var R = {}; // the Recurrent library
 		// to set gradients directly on m
 		return out;
 	}
-	var Solver = function () {
+	var Solver = function() {
 		this.decay_rate = 0.999;
 		this.smooth_eps = 1e-8;
 		this.step_cache = {};
 	}
 	Solver.prototype = {
-		step: function (model, step_size, regc, clipval) {
+		step: function(model, step_size, regc, clipval) {
 			// perform parameter update
 			var solver_stats = {};
 			var num_clipped = 0;
@@ -443,7 +443,7 @@ var R = {}; // the Recurrent library
 			return solver_stats;
 		}
 	}
-	var initLSTM = function (input_size, hidden_sizes, output_size) {
+	var initLSTM = function(input_size, hidden_sizes, output_size) {
 		// hidden size should be a list
 		var model = {};
 		for (var d = 0; d < hidden_sizes.length; d++) { // loop over depths
@@ -469,7 +469,7 @@ var R = {}; // the Recurrent library
 		model['bd'] = new Mat(output_size, 1);
 		return model;
 	}
-	var forwardLSTM = function (G, model, hidden_sizes, x, prev) {
+	var forwardLSTM = function(G, model, hidden_sizes, x, prev) {
 		// forward prop for a single tick of LSTM
 		// G is graph to append ops to
 		// model contains LSTM parameters
@@ -527,11 +527,11 @@ var R = {}; // the Recurrent library
 			'o': output
 		};
 	}
-	var sig = function (x) {
+	var sig = function(x) {
 		// helper function for computing sigmoid
 		return 1.0 / (1 + Math.exp(-x));
 	}
-	var maxi = function (w) {
+	var maxi = function(w) {
 		// argmax of array w
 		var maxv = w[0];
 		var maxix = 0;
@@ -544,7 +544,7 @@ var R = {}; // the Recurrent library
 		}
 		return maxix;
 	}
-	var samplei = function (w) {
+	var samplei = function(w) {
 		// sample argmax from w, assuming w are 
 		// probabilities that sum to one
 		var r = randf(0, 1);
@@ -587,10 +587,10 @@ var R = {}; // the Recurrent library
 })(R);
 // END OF RECURRENTJS
 var RL = {};
-(function (global) {
+(function(global) {
 	"use strict";
 	// syntactic sugar function for getting default parameter values
-	var getopt = function (opt, field_name, default_value) {
+	var getopt = function(opt, field_name, default_value) {
 		if (typeof opt === 'undefined') {
 			return default_value;
 		}
@@ -600,12 +600,12 @@ var RL = {};
 	var assert = R.assert;
 	var randi = R.randi;
 	var randf = R.randf;
-	var setConst = function (arr, c) {
+	var setConst = function(arr, c) {
 		for (var i = 0, n = arr.length; i < n; i++) {
 			arr[i] = c;
 		}
 	}
-	var sampleWeighted = function (p) {
+	var sampleWeighted = function(p) {
 		var r = Math.random();
 		var c = 0.0;
 		for (var i = 0, n = p.length; i < n; i++) {
@@ -624,7 +624,7 @@ var RL = {};
 	// - requires model of the environment :(
 	// - does not learn from experience :(
 	// - assumes finite MDP :(
-	var DPAgent = function (env, opt) {
+	var DPAgent = function(env, opt) {
 		this.V = null; // state value function
 		this.P = null; // policy distribution \pi(s,a)
 		this.env = env; // store pointer to environment
@@ -632,7 +632,7 @@ var RL = {};
 		this.reset();
 	}
 	DPAgent.prototype = {
-		reset: function () {
+		reset: function() {
 			// reset the agent's policy and value function
 			this.ns = this.env.getNumStates();
 			this.na = this.env.getMaxNumActions();
@@ -646,7 +646,7 @@ var RL = {};
 				}
 			}
 		},
-		act: function (s) {
+		act: function(s) {
 			// behave according to the learned policy
 			var poss = this.env.allowedActions(s);
 			var ps = [];
@@ -658,12 +658,12 @@ var RL = {};
 			var maxi = sampleWeighted(ps);
 			return poss[maxi];
 		},
-		learn: function () {
+		learn: function() {
 			// perform a single round of value iteration
 			self.evaluatePolicy(); // writes this.V
 			self.updatePolicy(); // writes this.P
 		},
-		evaluatePolicy: function () {
+		evaluatePolicy: function() {
 			// perform a synchronous update of the value function
 			var Vnew = zeros(this.ns);
 			for (var s = 0; s < this.ns; s++) {
@@ -685,7 +685,7 @@ var RL = {};
 			}
 			this.V = Vnew; // swap
 		},
-		updatePolicy: function () {
+		updatePolicy: function() {
 			// update policy to be greedy w.r.t. learned Value function
 			for (var s = 0; s < this.ns; s++) {
 				var poss = this.env.allowedActions(s);
@@ -716,7 +716,7 @@ var RL = {};
 	// QAgent uses TD (Q-Learning, SARSA)
 	// - does not require environment model :)
 	// - learns from experience :)
-	var TDAgent = function (env, opt) {
+	var TDAgent = function(env, opt) {
 		this.update = getopt(opt, 'update', 'qlearn'); // qlearn | sarsa
 		this.gamma = getopt(opt, 'gamma', 0.75); // future reward discount factor
 		this.epsilon = getopt(opt, 'epsilon', 0.1); // for epsilon-greedy policy
@@ -739,7 +739,7 @@ var RL = {};
 		this.reset();
 	}
 	TDAgent.prototype = {
-		reset: function () {
+		reset: function() {
 			// reset the agent's policy and value function
 			this.ns = this.env.getNumStates();
 			this.na = this.env.getMaxNumActions();
@@ -770,10 +770,10 @@ var RL = {};
 			this.a0 = null;
 			this.a1 = null;
 		},
-		resetEpisode: function () {
+		resetEpisode: function() {
 			// an episode finished
 		},
-		act: function (s) {
+		act: function(s) {
 			// act according to epsilon greedy policy
 			var poss = this.env.allowedActions(s);
 			var probs = [];
@@ -795,7 +795,7 @@ var RL = {};
 			this.a1 = a;
 			return a;
 		},
-		learn: function (r1) {
+		learn: function(r1) {
 			// takes reward for previous action, which came from a call to act()
 			if (!(this.r0 == null)) {
 				this.learnFromTuple(this.s0, this.a0, this.r0, this.s1, this.a1, this.lambda);
@@ -806,7 +806,7 @@ var RL = {};
 			}
 			this.r0 = r1; // store this for next update
 		},
-		updateModel: function (s0, a0, r0, s1) {
+		updateModel: function(s0, a0, r0, s1) {
 			// transition (s0,a0) -> (r0,s1) was observed. Update environment model
 			var sa = a0 * this.ns + s0;
 			if (this.env_model_s[sa] === -1) {
@@ -816,7 +816,7 @@ var RL = {};
 			this.env_model_s[sa] = s1;
 			this.env_model_r[sa] = r0;
 		},
-		plan: function () {
+		plan: function() {
 			// order the states based on current priority queue information
 			var spq = [];
 			for (var i = 0, n = this.sa_seen.length; i < n; i++) {
@@ -829,7 +829,7 @@ var RL = {};
 					});
 				}
 			}
-			spq.sort(function (a, b) {
+			spq.sort(function(a, b) {
 				return a.p < b.p ? 1 : -1
 			});
 			// perform the updates
@@ -853,7 +853,7 @@ var RL = {};
 				this.learnFromTuple(s0, a0, r0, s1, a1, 0); // note lambda = 0 - shouldnt use eligibility trace here
 			}
 		},
-		learnFromTuple: function (s0, a0, r0, s1, a1, lambda) {
+		learnFromTuple: function(s0, a0, r0, s1, a1, lambda) {
 			var sa = a0 * this.ns + s0;
 			// calculate the target for Q(s,a)
 			if (this.update === 'qlearn') {
@@ -917,7 +917,7 @@ var RL = {};
 				this.updatePolicy(s0);
 			}
 		},
-		updatePriority: function (s, a, u) {
+		updatePriority: function(s, a, u) {
 			// used in planning. Invoked when Q[sa] += update
 			// we should find all states that lead to (s,a) and upgrade their priority
 			// of being update in the next planning step
@@ -942,7 +942,7 @@ var RL = {};
 				}
 			}
 		},
-		updatePolicy: function (s) {
+		updatePolicy: function(s) {
 			var poss = this.env.allowedActions(s);
 			// set policy at s to be the action that achieves max_a Q(s,a)
 			// first find the maxy Q values
@@ -983,7 +983,7 @@ var RL = {};
 			}
 		}
 	}
-	var DQNAgent = function (env, opt) {
+	var DQNAgent = function(env, opt) {
 		this.gamma = getopt(opt, 'gamma', 0.75); // future reward discount factor
 		this.epsilon = getopt(opt, 'epsilon', 0.1); // for epsilon-greedy policy
 		this.alpha = getopt(opt, 'alpha', 0.01); // value function learning rate
@@ -996,7 +996,7 @@ var RL = {};
 		this.reset();
 	}
 	DQNAgent.prototype = {
-		reset: function () {
+		reset: function() {
 			this.nh = this.num_hidden_units; // number of hidden units
 			this.ns = this.env.getNumStates();
 			this.na = this.env.getMaxNumActions();
@@ -1018,7 +1018,7 @@ var RL = {};
 			this.a1 = null;
 			this.tderror = 0; // for visualization only...
 		},
-		toJSON: function () {
+		toJSON: function() {
 			// save function
 			var j = {};
 			j.nh = this.nh;
@@ -1027,14 +1027,14 @@ var RL = {};
 			j.net = R.netToJSON(this.net);
 			return j;
 		},
-		fromJSON: function (j) {
+		fromJSON: function(j) {
 			// load function
 			this.nh = j.nh;
 			this.ns = j.ns;
 			this.na = j.na;
 			this.net = R.netFromJSON(j.net);
 		},
-		forwardQ: function (net, s, needs_backprop) {
+		forwardQ: function(net, s, needs_backprop) {
 			var G = new R.Graph(needs_backprop);
 			var a1mat = G.add(G.mul(net.W1, s), net.b1);
 			var h1mat = G.tanh(a1mat);
@@ -1042,7 +1042,7 @@ var RL = {};
 			this.lastG = G; // back this up. Kind of hacky isn't it
 			return a2mat;
 		},
-		act: function (slist) {
+		act: function(slist) {
 			// convert to a Mat column vector
 			var s = new R.Mat(this.ns, 1);
 			s.setFrom(slist);
@@ -1061,7 +1061,7 @@ var RL = {};
 			this.a1 = a;
 			return a;
 		},
-		learn: function (r1) {
+		learn: function(r1) {
 			// perform an update on Q function
 			if (!(this.r0 == null) && this.alpha > 0) {
 				// learn from this tuple to get a sense of how "surprising" it is to the agent
@@ -1085,7 +1085,7 @@ var RL = {};
 			}
 			this.r0 = r1; // store for next update
 		},
-		learnFromTuple: function (s0, a0, r0, s1, a1) {
+		learnFromTuple: function(s0, a0, r0, s1, a1) {
 			// want: Q(s,a) = r + gamma * max_a' Q(s',a')
 			// compute the target Q value
 			var tmat = this.forwardQ(this.net, s1, false);
@@ -1106,7 +1106,7 @@ var RL = {};
 		}
 	}
 	// buggy implementation, doesnt work...
-	var SimpleReinforceAgent = function (env, opt) {
+	var SimpleReinforceAgent = function(env, opt) {
 		this.gamma = getopt(opt, 'gamma', 0.5); // future reward discount factor
 		this.epsilon = getopt(opt, 'epsilon', 0.75); // for epsilon-greedy policy
 		this.alpha = getopt(opt, 'alpha', 0.001); // actor net learning rate
@@ -1115,7 +1115,7 @@ var RL = {};
 		this.reset();
 	}
 	SimpleReinforceAgent.prototype = {
-		reset: function () {
+		reset: function() {
 			this.ns = this.env.getNumStates();
 			this.na = this.env.getMaxNumActions();
 			this.nh = 100; // number of hidden units
@@ -1138,7 +1138,7 @@ var RL = {};
 			this.baselineGraphs = [];
 			this.t = 0;
 		},
-		forwardActor: function (s, needs_backprop) {
+		forwardActor: function(s, needs_backprop) {
 			var net = this.actorNet;
 			var G = new R.Graph(needs_backprop);
 			var a1mat = G.add(G.mul(net.W1, s), net.b1);
@@ -1149,7 +1149,7 @@ var RL = {};
 				'G': G
 			}
 		},
-		forwardValue: function (s, needs_backprop) {
+		forwardValue: function(s, needs_backprop) {
 			var net = this.baselineNet;
 			var G = new R.Graph(needs_backprop);
 			var a1mat = G.add(G.mul(net.W1, s), net.b1);
@@ -1160,7 +1160,7 @@ var RL = {};
 				'G': G
 			}
 		},
-		act: function (slist) {
+		act: function(slist) {
 			// convert to a Mat column vector
 			var s = new R.Mat(this.ns, 1);
 			s.setFrom(slist);
@@ -1189,7 +1189,7 @@ var RL = {};
 			this.a1 = a;
 			return a;
 		},
-		learn: function (r1) {
+		learn: function(r1) {
 			// perform an update on Q function
 			this.rewardHistory.push(r1);
 			var n = this.rewardHistory.length;
@@ -1257,7 +1257,7 @@ var RL = {};
 		},
 	}
 	// buggy implementation as well, doesn't work
-	var RecurrentReinforceAgent = function (env, opt) {
+	var RecurrentReinforceAgent = function(env, opt) {
 		this.gamma = getopt(opt, 'gamma', 0.5); // future reward discount factor
 		this.epsilon = getopt(opt, 'epsilon', 0.1); // for epsilon-greedy policy
 		this.alpha = getopt(opt, 'alpha', 0.001); // actor net learning rate
@@ -1266,7 +1266,7 @@ var RL = {};
 		this.reset();
 	}
 	RecurrentReinforceAgent.prototype = {
-		reset: function () {
+		reset: function() {
 			this.ns = this.env.getNumStates();
 			this.na = this.env.getMaxNumActions();
 			this.nh = 40; // number of hidden units
@@ -1288,7 +1288,7 @@ var RL = {};
 			this.a0 = null;
 			this.a1 = null;
 		},
-		act: function (slist) {
+		act: function(slist) {
 			// convert to a Mat column vector
 			var s = new R.Mat(this.ns, 1);
 			s.setFrom(slist);
@@ -1316,7 +1316,7 @@ var RL = {};
 			this.a1 = a;
 			return a;
 		},
-		learn: function (r1) {
+		learn: function(r1) {
 			// perform an update on Q function
 			this.rewardHistory.push(r1);
 			var n = this.rewardHistory.length;
@@ -1382,7 +1382,7 @@ var RL = {};
 		},
 	}
 	// Currently buggy implementation, doesnt work
-	var DeterministPG = function (env, opt) {
+	var DeterministPG = function(env, opt) {
 		this.gamma = getopt(opt, 'gamma', 0.5); // future reward discount factor
 		this.epsilon = getopt(opt, 'epsilon', 0.5); // for epsilon-greedy policy
 		this.alpha = getopt(opt, 'alpha', 0.001); // actor net learning rate
@@ -1391,7 +1391,7 @@ var RL = {};
 		this.reset();
 	}
 	DeterministPG.prototype = {
-		reset: function () {
+		reset: function() {
 			this.ns = this.env.getNumStates();
 			this.na = this.env.getMaxNumActions();
 			this.nh = 100; // number of hidden units
@@ -1411,7 +1411,7 @@ var RL = {};
 			this.a1 = null;
 			this.t = 0;
 		},
-		forwardActor: function (s, needs_backprop) {
+		forwardActor: function(s, needs_backprop) {
 			var net = this.actorNet;
 			var G = new R.Graph(needs_backprop);
 			var a1mat = G.add(G.mul(net.W1, s), net.b1);
@@ -1422,7 +1422,7 @@ var RL = {};
 				'G': G
 			}
 		},
-		act: function (slist) {
+		act: function(slist) {
 			// convert to a Mat column vector
 			var s = new R.Mat(this.ns, 1);
 			s.setFrom(slist);
@@ -1449,7 +1449,7 @@ var RL = {};
 			this.a1 = a;
 			return a;
 		},
-		utilJacobianAt: function (s) {
+		utilJacobianAt: function(s) {
 			var ujacobian = new R.Mat(this.ntheta, this.na);
 			for (var a = 0; a < this.na; a++) {
 				R.netZeroGrads(this.actorNet);
@@ -1461,7 +1461,7 @@ var RL = {};
 			}
 			return ujacobian;
 		},
-		learn: function (r1) {
+		learn: function(r1) {
 			// perform an update on Q function
 			//this.rewardHistory.push(r1);
 			if (!(this.r0 == null)) {
@@ -1544,7 +1544,7 @@ var Trevel = {
 	lbcount: 0,
 	nextBet: "",
 	previousReward: 0,
-	addBet: function (bet, outcome) {
+	addBet: function(bet, outcome) {
 		if (bet === "LB" && outcome === "Win") {
 			this.betHistory.push("LO");
 			this.betOutcomes.push("W");
@@ -1569,7 +1569,7 @@ var Trevel = {
 		}
 		this.totalBets++;
 	},
-	calculateProbabilities: function () {
+	calculateProbabilities: function() {
 		this.hbProbability = this.hbCount / this.betHistory.length;
 		this.lbProbability = this.lbcount / this.betHistory.length;
 		this.winRate = this.totalWins / this.totalBets;
@@ -1577,27 +1577,27 @@ var Trevel = {
 			this.profit = this.getProfit();
 		}
 	},
-	getCurrentBalance: function () {
+	getCurrentBalance: function() {
 		return parseFloat($('#balance').html());
 	},
-	placeHighBet: function () {
+	placeHighBet: function() {
 		$('#double_your_btc_bet_hi_button').click();
 	},
-	placeLowBet: function () {
+	placeLowBet: function() {
 		$('#double_your_btc_bet_lo_button').click();
 	},
-	setBetAmount: function (amount) {
+	setBetAmount: function(amount) {
 		var elem = document.getElementById("double_your_btc_stake");
 		elem.value = amount;
 	},
-	setOutcome: function (bet) {
+	setOutcome: function(bet) {
 		if ($('#double_your_btc_bet_lose').html() !== '') {
 			this.addBet(bet, "Loose");
 		} else {
 			this.addBet(bet, "Win");
 		}
 	},
-	prepareBet: function () {
+	prepareBet: function() {
 		this.calculateProbabilities();
 		if (this.betHistory.length < 10) {
 			if (this.useMartingale === true && this.betHistory.length > 12) {
@@ -1626,7 +1626,7 @@ var Trevel = {
 			}
 		}
 	},
-	placeBet: function () {
+	placeBet: function() {
 		if (this.nextBet === "HB") {
 			this.placeHighBet();
 		} else if (this.nextBet === "LB") {
@@ -1642,23 +1642,23 @@ var Trevel = {
 			this.placeLowBet();
 		}
 	},
-	getProfit: function () {
+	getProfit: function() {
 		return (this.getCurrentBalance() - this.startingBalance).toFixed(8);
 	},
-	getNumStates: function () {
+	getNumStates: function() {
 		return 8;
 	},
-	getMaxNumActions: function () {
+	getMaxNumActions: function() {
 		return 2;
 	},
-	getSentiment: function (bet) {
+	getSentiment: function(bet) {
 		if (bet === "HI") {
 			return 1;
 		} else {
 			return 0;
 		}
 	},
-	getPreviousBets: function () {
+	getPreviousBets: function() {
 		var hist = [];
 		if (this.betHistory.length > 12) {
 			hist.push(this.getSentiment(this.betHistory[this.betHistory.length - 1]));
@@ -1674,11 +1674,11 @@ var Trevel = {
 		}
 		return hist;
 	},
-	getAgentState: function () { //we'll observe the last 8 bets
+	getAgentState: function() { //we'll observe the last 8 bets
 		var s = this.getPreviousBets();
 		return s;
 	},
-	getReward: function () {
+	getReward: function() {
 		var reward = 0;
 		var out1 = this.betOutcomes[this.betOutcomes.length - 1];
 		var out2 = this.betOutcomes[this.betOutcomes.length - 2];
@@ -1715,10 +1715,10 @@ var Trevel = {
 		return reward;
 	},
 	//for raw testing only
-	randomNumber: function (min, max) {
+	randomNumber: function(min, max) {
 		return Math.floor(Math.random() * (max - min + 1) + min);
 	},
-	getTestOutcome: function (random) {
+	getTestOutcome: function(random) {
 		if (random % 2 === 0) {
 			return "HI";
 		} else {
@@ -1726,7 +1726,7 @@ var Trevel = {
 		}
 	},
 	//random string for random seed
-	rString: function (length, chars) {
+	rString: function(length, chars) {
 		var result = '';
 		var length = 16;
 		var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz'
@@ -1734,11 +1734,11 @@ var Trevel = {
 		return result;
 	},
 	//set client seed as random string
-	rSeed: function () {
+	rSeed: function() {
 		$('#next_client_seed').val(rString());
 	},
 	//initialize this
-	init: function () {
+	init: function() {
 		this.startingBalance = this.currentBalance = parseFloat($('#balance').html());
 		this.setBetAmount(this.minBet);
 		this.stop = true;
@@ -1748,7 +1748,7 @@ var Trevel = {
 
 	},
 	// ask user config variables
-	config: function () {
+	config: function() {
 
 		//define temporary variables
 		var maxb = 0, minb = 0;
@@ -1782,7 +1782,7 @@ var Trevel = {
 		//start betting
 		startbetting();
 	},
-	stopbets: function () {
+	stopbets: function() {
 		env.stop = true;
 		clearInterval(interval);
 		console.log('Bet session has been stopped, to start over click start.');
@@ -1816,7 +1816,7 @@ function startbetting() {
 	console.log('Starting bet session, to stop click STOP BOT');
 	document.getElementById("free_play_link_li").innerHTML = '<a href="#" onclick="Trevel.stopbets()" class="free_play_link">STOP BOT</a>';
 	env.stop = false;
-	interval = setInterval(function () { loop(); }, env.betSpeed);
+	interval = setInterval(function() { loop(); }, env.betSpeed);
 }
 console.clear();
 console.log('You are using Trevel, with ReinforceJS');
