@@ -1516,11 +1516,12 @@ var Trevel = {
 	//settings you can change
 	stop: true,
 	maxBet: 0.00001,
-	minBet: 0.00000005,
+	minBet: 0.00000001,
 	swap: true,
 	betSpeed: 100,//change this on init
 	verbose: true,
 	isTesting: false,
+	newseed: '', // 'win' for change ever win, 'lose' for change every loss, blank for every roll
 	//money management
 	useKelly: false,//martingale performs better on live account!
 	korm: false,
@@ -1542,6 +1543,10 @@ var Trevel = {
 	lbProbability: 0,
 	hbCount: 0,
 	lbcount: 0,
+	hbw: 0,
+	hbl: 0,
+	lbw: 0,
+	lbl: 0,
 	nextBet: "",
 	previousReward: 0,
 	addBet: function(bet, outcome) {
@@ -1550,22 +1555,26 @@ var Trevel = {
 			this.betOutcomes.push("W");
 			this.totalWins++;
 			this.lbcount++;
+			this.lbw++;
 		}
 		if (bet === "LB" && outcome === "Loose") {
 			this.betHistory.push("HI");
 			this.hbCount++;
 			this.betOutcomes.push("L");
+			this.lbl++;
 		}
 		if (bet === "HB" && outcome === "Win") {
 			this.betHistory.push("HI");
 			this.totalWins++;
 			this.hbCount++;
 			this.betOutcomes.push("W");
+			this.hbw++;
 		}
 		if (bet === "HB" && outcome === "Loose") {
 			this.betHistory.push("LO");
 			this.lbcount++;
 			this.betOutcomes.push("L");
+			this.hbl++;
 		}
 		this.totalBets++;
 	},
@@ -1593,7 +1602,13 @@ var Trevel = {
 	setOutcome: function(bet) {
 		if ($('#double_your_btc_bet_lose').html() !== '') {
 			this.addBet(bet, "Loose");
+			if (this.newseed == 'lose') {
+				this.rSeed();
+			}
 		} else {
+			if (this.newseed == 'win') {
+				this.rSeed();
+			}
 			this.addBet(bet, "Win");
 		}
 	},
@@ -1761,6 +1776,7 @@ var Trevel = {
 		this.martingaleMultiplier = prompt('Bet multiplier on lose', 2);
 		this.swap = prompt('True for swap enabled, false for disabled', 'true');
 		this.korm = prompt('True to enable Kelly, false to enabled martingale, leave blank for both', 'false');
+		this.newseed = prompt('Randomize client seed every "win", "lose", or leave blank for every roll', '');
 		this.betSpeed = prompt('Wait time before next bet is placed in ms', 3000);
 
 		//convert satoshi to btc
@@ -1825,8 +1841,11 @@ console.log('Click it to set the config. Note: These settings are not persistent
 console.log('To change the default values for these settings, search the script for "prompt"');
 console.log('Enjoy');
 function loop() {
+	if (Trevel.newseed == '') {
 		env.rSeed();
-	
+	}
+
+
 	if (env.stop === false) {
 		var state = env.getAgentState();
 		var action = agent.act(state);
@@ -1847,8 +1866,19 @@ function loop() {
 			}
 			if (env.verbose === true) {
 				env.calculateProbabilities();
+				clear();
+
 				//console.log("Machine Bet: " + action + "{" + env.nextBet + "} isKelly: " + env.useKelly + " isMartingale: " + env.useMartingale);
-				console.log("Profit: " + env.profit + " WinRate: " + (env.winRate * 100).toFixed(2));
+				console.log("Bet Number: " + env.totalBets + " | Outcome: " + outcome);
+				console.log("Win Rate: " + (env.winRate * 100).toFixed(2) + " | Hi/Lo Win Rate: " + ((env.hbw / env.totalBets) * 100).toFixed(2) + " / " + ((env.lbw / env.totalBets) * 100).toFixed(2));
+				console.log("Wins/Loses: " + env.totalWins + " / " + (env.totalBets - env.totalWins));
+				console.log("Hi/Lo Bets: " + env.hbCount + " / " + env.lbcount);
+				console.log("Hi/Lo Wins: " + env.hbw + " / " + env.lbw);
+				console.log("Hi/Lo Loses: " + env.hbl + " / " + env.lbl);
+				console.log("Hi Probability: " + env.hbProbability.toFixed(2) + " | Lo Probability: " + env.lbProbability.toFixed(2));
+				console.log("Client Seed: " + $('#next_client_seed').val() + " | Lotto Tickets: " + $('#user_lottery_tickets').html() + " | Rewards Points: " + $('.user_reward_points').text());
+				console.log("Profit: " + env.profit + " | Balance: " + env.getCurrentBalance().toFixed(8));
+
 			}
 		} else {
 			console.log("Action: " + action);
