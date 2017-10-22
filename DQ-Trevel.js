@@ -1735,7 +1735,7 @@ var Trevel = {
 	},
 	//set client seed as random string
 	rSeed: function() {
-		$('#next_client_seed').val(rString());
+		$('#next_client_seed').val(this.rString());
 	},
 	//initialize this
 	init: function() {
@@ -1825,9 +1825,8 @@ console.log('Click it to set the config. Note: These settings are not persistent
 console.log('To change the default values for these settings, search the script for "prompt"');
 console.log('Enjoy');
 function loop() {
-	if (env.profit > 0.00000500) {
 		env.rSeed();
-	}
+	
 	if (env.stop === false) {
 		var state = env.getAgentState();
 		var action = agent.act(state);
